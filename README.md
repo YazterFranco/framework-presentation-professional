@@ -83,12 +83,12 @@ pip install -r requirements.txt   # (coming in Phase 2)
 ## Phases
 
 - [x] **Phase 0** — Repo scaffold + docs + agent specs
-- [ ] **Phase 1** — Skills: audience-profiler + narrative-architect (prompt-based, no deps)
-- [ ] **Phase 2** — Skills: slide-composer + humanizer
-- [ ] **Phase 3** — Critic agent + iteration loop
-- [ ] **Phase 4** — Kiro Crew workflow (end-to-end pipeline)
-- [ ] **Phase 5** — Template library + examples
-- [ ] **Phase 6** — Output formats: Markdown, HTML reveal.js, PPTX
+- [x] **Phase 1** — Skills: `analyze-audience` + `build-narrative` (prompt-based, no deps)
+- [x] **Phase 2** — Skills: `compose-slides` + `humanize-content` + `critique-deck`
+- [ ] **Phase 3** — Kiro Crew workflow (end-to-end pipeline as `.kiro/workflows/build-presentation.yml`)
+- [ ] **Phase 4** — Template library + examples (tech-to-exec, tech-to-investor, internal-demo)
+- [ ] **Phase 5** — Output formats: HTML Reveal.js, speaker notes export
+- [ ] **Phase 6** — PPTX export via python-pptx
 
 ---
 
@@ -98,11 +98,10 @@ Each phase is designed to introduce a new Kiro Crew concept:
 
 | Phase | Kiro Crew concept you'll practice |
 |-------|-----------------------------------|
-| 1 | Skills (prompt files that give Kiro specialized behavior) |
-| 2 | Chained skills (output of one feeds the next) |
-| 3 | Subagents (critic runs independently, parallel review) |
-| 4 | Workflows (multi-phase, restartable pipelines) |
-| 5 | Artifacts (saving + versioning generated outputs) |
+| 1–2 | Skills (prompt files that give Kiro specialized behavior) |
+| 3 | Workflows (multi-phase, restartable pipelines via `workflow_run`) |
+| 4 | Artifacts (saving + versioning generated outputs) |
+| 5 | Subagents (critic runs independently, parallel review) |
 | 6 | Crons (scheduled deck refreshes, reminders) |
 
 ---
