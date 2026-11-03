@@ -85,8 +85,8 @@ pip install -r requirements.txt   # (coming in Phase 2)
 - [x] **Phase 0** — Repo scaffold + docs + agent specs
 - [x] **Phase 1** — Skills: `analyze-audience` + `build-narrative` (prompt-based, no deps)
 - [x] **Phase 2** — Skills: `compose-slides` + `humanize-content` + `critique-deck`
-- [ ] **Phase 3** — Kiro Crew workflow (end-to-end pipeline as `.kiro/workflows/build-presentation.yml`)
-- [ ] **Phase 4** — Template library + examples (tech-to-exec, tech-to-investor, internal-demo)
+- [x] **Phase 3** — Kiro Crew workflow (end-to-end pipeline as `.kiro/workflows/build-presentation.yml`)
+- [x] **Phase 4** — Template library + examples (tech-to-exec, tech-to-investor, internal-demo)
 - [ ] **Phase 5** — Output formats: HTML Reveal.js, speaker notes export
 - [ ] **Phase 6** — PPTX export via python-pptx
 
