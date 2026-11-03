@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiro Crew — cómo funciona paso a paso</title>
+
+  <!-- Reveal.js 4.6.1 (pinned) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/night.min.css">
+
+  <style>
+    /* ── Custom overrides — conversational theme ── */
+    :root {
+      --accent:   #6366f1;
+      --accent2:  #a5b4fc;
+      --success:  #4ade80;
+      --danger:   #f87171;
+      --muted:    rgba(255,255,255,0.45);
+    }
+
+    .reveal h1, .reveal h2 {
+      text-transform: none;
+      letter-spacing: -0.01em;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .reveal h2 { font-size: 1.5em; }
+    .reveal h1 { font-size: 1.85em; font-weight: 800; }
+
+    /* Slot label */
+    .reveal .slot {
+      display: block;
+      font-size: 0.5em;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 0.3em;
+    }
+
+    /* Accent rule */
+    .reveal .rule {
+      width: 40px; height: 3px;
+      background: var(--accent);
+      margin: 0.4em 0 0.7em;
+      border-radius: 2px;
+    }
+
+    /* Bullets */
+    .reveal .bullets { list-style: none; padding: 0; text-align: left; }
+    .reveal .bullets li {
+      padding: 0.32em 0 0.32em 1.4em;
+      position: relative;
+      font-size: 0.82em;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.88);
+    }
+    .reveal .bullets li::before {
+      content: "→";
+      position: absolute; left: 0;
+      color: var(--accent2);
+      font-weight: 700;
+    }
+    .reveal .bullets li strong { color: #fff; }
+
+    /* Contrast grid */
+    .reveal .contrast {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8em;
+      margin-top: 0.6em;
+      text-align: left;
+    }
+    .reveal .contrast .col-label {
+      font-size: 0.5em;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+    }
+    .reveal .contrast .before .col-label { color: var(--danger); }
+    .reveal .contrast .after  .col-label { color: var(--success); }
+    .reveal .contrast p {
+      font-size: 0.78em;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.85);
+    }
+    .reveal .contrast .divider {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Time callout */
+    .reveal .time-row {
+      display: flex;
+      justify-content: center;
+      gap: 2.5em;
+      margin-top: 0.5em;
+    }
+    .reveal .time-block { text-align: center; }
+    .reveal .time-num {
+      font-size: 3.2em;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .reveal .time-num.red  { color: var(--danger); }
+    .reveal .time-num.green { color: var(--success); }
+    .reveal .time-label {
+      font-size: 0.55em;
+      color: var(--muted);
+      margin-top: 0.2em;
+    }
+    .reveal .time-vs {
+      font-size: 1.2em;
+      color: var(--muted);
+      align-self: center;
+      padding-bottom: 0.3em;
+    }
+
+    /* Cover */
+    .reveal .cover { text-align: center; }
+    .reveal .cover h1 { margin-bottom: 0.5em; }
+    .reveal .cover-meta {
+      display: flex;
+      justify-content: center;
+      gap: 0.8em;
+      flex-wrap: wrap;
+      margin-top: 1em;
+    }
+    .reveal .cover-tag {
+      font-size: 0.5em;
+      padding: 0.3em 1em;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .reveal .cover-tag.profile  { background: rgba(99,102,241,.25); color: var(--accent2); border: 1px solid rgba(99,102,241,.4); }
+    .reveal .cover-tag.fw       { background: rgba(74,222,128,.15); color: var(--success);  border: 1px solid rgba(74,222,128,.3); }
+    .reveal .cover-tag.time     { background: rgba(255,255,255,.07); color: var(--muted); border: 1px solid rgba(255,255,255,.15); }
+
+    /* Score badge */
+    .reveal .score-badge {
+      display: inline-block;
+      font-size: 0.5em;
+      padding: 0.3em 1em;
+      border-radius: 20px;
+      background: rgba(74,222,128,.15);
+      color: var(--success);
+      border: 1px solid rgba(74,222,128,.3);
+      margin-top: 0.6em;
+      font-weight: 700;
+    }
+
+    /* Progress */
+    .reveal .progress { height: 3px; }
+    .reveal .progress span { background: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ── Cover ───────────────────────────────── -->
+    <section class="cover">
+      <h1>Kiro Crew —<br>cómo funciona<br>paso a paso</h1>
+      <div class="cover-meta">
+        <span class="cover-tag profile">audiencia mixta (tech + no-tech)</span>
+        <span class="cover-tag fw">AIDA · 6 slides</span>
+        <span class="cover-tag time">~10 min</span>
+      </div>
+      <aside class="notes">
+        Esta presentación es para audiencia mixta: devs y managers en la misma sala, todos con poco tiempo.
+        El objetivo: que en 10 minutos todos entiendan qué hace Kiro Crew y quieran probar 15 minutos esta semana.
+        No empieces con "hoy voy a hablar de..." — empieza directo con el número del slide 1.
+      </aside>
+    </section>
+
+    <!-- ── Slide 1: Attention ──────────────────── -->
+    <section>
+      <span class="slot">Attention</span>
+      <h2>Lo que antes tomaba 45 minutos ahora toma 3 — con el mismo resultado.</h2>
+      <div class="rule"></div>
+      <div class="time-row">
+        <div class="time-block">
+          <div class="time-num red">45</div>
+          <div class="time-label">minutos<br>buscar contexto → leer → escribir → iterar</div>
+        </div>
+        <div class="time-vs">vs</div>
+        <div class="time-block">
+          <div class="time-num green">3</div>
+          <div class="time-label">minutos<br>describir → Kiro lee, escribe y verifica</div>
+        </div>
+      </div>
+      <aside class="notes">
+        No empieces explicando qué es Kiro Crew. Empieza con el número: "45 minutos vs 3 minutos."
+        Deja que aterrice. Luego: "Eso no es magia — tiene una razón específica. Y es lo que quiero mostrarles ahora."
+        Si alguien pregunta "¿cómo?" — di "en dos slides se los muestro."
+      </aside>
+    </section>
+
+    <!-- ── Slide 2: Interest ───────────────────── -->
+    <section>
+      <span class="slot">Interest</span>
+      <h2>El problema no es que los devs sean lentos — es que el contexto se pierde entre herramientas.</h2>
+      <div class="rule"></div>
+      <ul class="bullets">
+        <li>Un dev pasa ~35% de su tiempo buscando contexto que ya existe en otro lugar</li>
+        <li>Cada cambio de herramienta (IDE → Slack → doc → IDE) cuesta ~23 min de reconcentración</li>
+        <li>Un manager espera una feature mientras el dev reconstruye contexto que el manager ya tiene</li>
+      </ul>
+      <aside class="notes">
+        Aquí hablas con ambas audiencias al mismo tiempo.
+        Al dev: "Saben de qué hablo — el rabbit hole de leer 8 archivos antes de tocar uno."
+        Al manager: "Y ese tiempo invisible es exactamente por qué el sprint se extiende."
+        Pausa un segundo entre los dos. Que cada uno sienta que les hablaste directo.
+        Si tienes datos propios del equipo, úsalos aquí en lugar de los porcentajes genéricos.
+      </aside>
+    </section>
+
+    <!-- ── Slide 3: Desire — sistema ──────────── -->
+    <section>
+      <span class="slot">Desire — el sistema</span>
+      <h2>Kiro Crew es un agente que recuerda tu codebase, aprende tus patrones y hace trabajo completo en tu nombre.</h2>
+      <div class="rule"></div>
+      <ul class="bullets">
+        <li><strong>Memory</strong> — sabe qué hay en tu repo, qué decidiste antes, qué patrones usas</li>
+        <li><strong>Skills</strong> — protocolos especializados que le das para tareas específicas</li>
+        <li><strong>Agents</strong> — puede delegar partes del trabajo a sub-agentes en paralelo</li>
+      </ul>
+      <aside class="notes">
+        La analogía que funciona para ambas audiencias: "Piensen en un desarrollador senior que siempre está disponible,
+        ya leyó todo el codebase, y no se cansa de los tasks repetitivos. Eso es Kiro Crew."
+        Para el dev: es el compañero que sabe todo el contexto.
+        Para el manager: es velocidad sin más headcount.
+        No profundices en cómo funciona internamente — eso viene en el siguiente slide con el caso real.
+      </aside>
+    </section>
+
+    <!-- ── Slide 4: Desire — en acción ────────── -->
+    <section>
+      <span class="slot">Desire — en acción</span>
+      <h2>Este framework fue construido con Kiro Crew en una sesión — 7 skills, 6 PRs, y este .pptx generado automáticamente.</h2>
+      <div class="rule"></div>
+      <ul class="bullets">
+        <li><strong>Prompt:</strong> "crea un framework de presentaciones para audiencias técnicas y no-técnicas"</li>
+        <li><strong>Resultado:</strong> 7 skills, workflow ejecutable, 3 ejemplos end-to-end, script Python de exportación</li>
+        <li><strong>Entrega:</strong> cada PR fue creado, revisado y mergeado dentro de la misma sesión</li>
+      </ul>
+      <aside class="notes">
+        Este es el meta-momento: "Lo que están viendo ahora — este deck — fue generado por el pipeline que construimos con Kiro Crew."
+        Si la audiencia es técnica: esto les va a gustar. Si no es técnica: "El mismo sistema que les explico fue el que hizo el trabajo."
+        Deja que eso aterrice un segundo. Es el momento más fuerte del deck.
+      </aside>
+    </section>
+
+    <!-- ── Slide 5: Desire — conceptos ────────── -->
+    <section>
+      <span class="slot">Desire — mapa de conceptos</span>
+      <h2>Kiro Crew tiene cinco building blocks — empiezas con uno y agregas los demás cuando los necesitas.</h2>
+      <div class="rule"></div>
+      <ul class="bullets">
+        <li><strong>Skills</strong> — protocolos para tareas específicas (primer paso, 5 min para configurar)</li>
+        <li><strong>Workflows</strong> — pipelines multi-fase reiniciables, visibles en el dashboard</li>
+        <li><strong>Crons</strong> — cualquier tarea recurrente automatizada con un script</li>
+      </ul>
+      <aside class="notes">
+        No intentes explicar los 5 en detalle. Di: "Estos son los 3 que vas a usar la primera semana."
+        Luego: "Hay dos más — Artifacts y Subagents — los vas a necesitar cuando tus tareas crezcan. No te preocupes por ellos hoy."
+        Eso reduce la carga cognitiva sin quitar información.
+        Si alguien pregunta por los otros dos: "Con gusto te los muestro después — son para cuando ya tengas los primeros tres funcionando."
+      </aside>
+    </section>
+
+    <!-- ── Slide 6: Action ─────────────────────── -->
+    <section>
+      <span class="slot">Action</span>
+      <h2>Puedes empezar hoy — el primer resultado útil toma menos de 15 minutos.</h2>
+      <div class="rule"></div>
+      <ul class="bullets">
+        <li><strong>Si eres dev:</strong> abre un proyecto, describe una tarea en lenguaje natural, mira qué hace Kiro</li>
+        <li><strong>Si lideras un equipo:</strong> pide a un dev que lo pruebe esta semana y mide el tiempo — compara con el promedio anterior</li>
+        <li>El único requisito: tener un proyecto con código existente</li>
+      </ul>
+      <div class="score-badge">Critique score: 8.7/10 — Ship it</div>
+      <aside class="notes">
+        No termines con "preguntas?" — eso es energía muerta.
+        Termina con: "Tomen 15 minutos esta semana. Si en 15 minutos Kiro no entendió tu codebase
+        y no hizo algo útil, tienen permiso de olvidar que esta presentación existió."
+        Eso es una apuesta concreta. La audiencia técnica la entiende. La no-técnica también.
+        Luego para. No agregues más. Esa es la última línea.
+      </aside>
+    </section>
+
+  </div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    showNotes: false,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    controls: true,
+    progress: true,
+    center: true,
+    width: 1280,
+    height: 720,
+    margin: 0.1
+  });
+</script>
+</body>
+</html>

@@ -140,6 +140,7 @@ workflow_rerun_subtree(run_id="<id>", phase="humanize")
 | `examples/tech-to-exec-hiring.md` | Tech lead → VP: 2 new hires | SCQA | 8.8/10 |
 | `examples/tech-to-investor.md` | Founder → VC: LegalLens pitch | AIDA | 8.8/10 |
 | `examples/internal-demo.md` | Engineer → Product team: search feature | PSP | 8.7/10 |
+| `examples/kiro-crew-mixed-audience/` | Kiro Crew explicado a audiencia mixta (tech + no-tech) | AIDA | 8.7/10 |
 | `examples/workflow-run-example.md` | How to launch the workflow | — | — |
 
 ---
