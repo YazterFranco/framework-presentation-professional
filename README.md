@@ -1,47 +1,50 @@
 # 🎯 Framework: Professional & Humanized Presentations
 
-> A multi-agent Kiro Crew framework that turns raw ideas into audience-aware, high-impact presentations — from a 3-slide pitch to a full deck.
+> A multi-agent Kiro Crew framework that turns raw ideas into audience-aware, high-impact presentations — from a 3-slide pitch to a full deck exported as HTML or PowerPoint.
 
-## The Core Problem
-
-Technical people (engineers, data scientists, product folks) have great ideas but struggle to translate them to non-technical audiences. They over-explain mechanics, under-deliver on relevance, and lose people in the first 30 seconds.
-
-This framework fixes that. You describe your idea + your audience; the agents do the rest.
+[![Phases](https://img.shields.io/badge/phases-0–6%20complete-brightgreen)](#phases)
+[![Skills](https://img.shields.io/badge/skills-7-blue)](#skills)
+[![Output](https://img.shields.io/badge/output-markdown%20%7C%20html%20%7C%20pptx-orange)](#output-formats)
 
 ---
 
-## Agent Architecture
+## The Core Problem
+
+Technical people have great ideas but struggle to translate them to non-technical audiences. They over-explain mechanics, under-deliver on relevance, and lose people in the first 30 seconds.
+
+This framework fixes that. You describe your idea + your audience — the pipeline does the rest.
+
+---
+
+## Agent Pipeline
 
 ```
-Input: {idea, context, audience_type, output_format}
+Input: {idea, audience_description, output_format}
         │
         ▼
 ┌─────────────────────┐
-│  audience-profiler  │  → Who are they? What do they care about? What kills their attention?
+│  analyze-audience   │  → Who are they? What kills their attention? Which framework fits?
 └──────────┬──────────┘
-           │
            ▼
 ┌─────────────────────┐
-│ narrative-architect │  → Picks the right framework (SCQA, Pyramid, AIDA…) + builds the story arc
+│  build-narrative    │  → Picks SCQA / AIDA / Pyramid / PSP + builds the story arc
 └──────────┬──────────┘
-           │
            ▼
 ┌─────────────────────┐
-│  slide-composer     │  → Generates slide content: titles, body, data callouts, visuals direction
+│  compose-slides     │  → Generates slide content: action titles, bullets, speaker notes
 └──────────┬──────────┘
-           │
            ▼
 ┌─────────────────────┐
-│   humanizer         │  → Rewrites language for the specific audience — removes jargon, adds hooks
+│  humanize-content   │  → Removes jargon, applies hook, adjusts reading level
 └──────────┬──────────┘
-           │
            ▼
 ┌─────────────────────┐
-│   critic            │  → Punches holes in the deck: clarity, flow, missing "so what", weak endings
+│  critique-deck      │  → Scores 6 dimensions (1–10), produces fix list
 └──────────┬──────────┘
-           │
            ▼
-Output: Polished slide content + speaker notes + delivery tips
+┌─────────────────────┐
+│  render output      │  → Markdown | HTML Reveal.js | .pptx
+└─────────────────────┘
 ```
 
 ---
@@ -60,24 +63,37 @@ Output: Polished slide content + speaker notes + delivery tips
 
 ## Audience Profiles
 
-- `tech-to-exec` — Engineer explaining to VP/C-suite
-- `tech-to-investor` — Founder pitching to non-tech VC
-- `tech-to-tech` — Deep-dive for peers (less humanization, more precision)
-- `internal-demo` — Feature demo to mixed product team
-- `workshop` — Educational presentation to a learning group
+| Profile | Description | Framework |
+|---------|-------------|-----------|
+| `tech-to-exec` | Engineer → VP/C-suite | SCQA |
+| `tech-to-investor` | Founder → non-tech VC | AIDA |
+| `tech-to-tech` | Deep-dive for peers | Pyramid |
+| `internal-demo` | Feature demo to mixed team | Problem-Solution-Proof |
+| `workshop` | Educational presentation | Pyramid or PSP |
+
+---
+
+## Output Formats
+
+| Format | Command | Use case |
+|--------|---------|----------|
+| `markdown` | Default | Paste into Notion, Google Slides, Confluence |
+| `html-reveal` | `render-html-reveal` skill | Browser presentation, no internet needed |
+| `pptx` | `python3 scripts/generate_pptx.py` | PowerPoint, Google Slides, Keynote |
+| `speaker-notes` | Embedded in all formats | Presenter View (PPTX) or S key (HTML) |
 
 ---
 
 ## Quick Start
 
 ```bash
-# Install
-pip install python-pptx==1.0.2   # required for PPTX export
+# Install PPTX dependency
+pip install python-pptx==1.0.2
 
-# Run via Kiro Crew
-# → Ask Kiro: "Use the presentation framework to build a pitch for [your idea] targeting [your audience]"
+# Run via Kiro Crew (recommended)
+# → Ask Kiro: "Use the presentation framework to build a pitch for [idea] targeting [audience]"
 
-# Generate PPTX directly
+# Generate PPTX directly from a composed deck
 python3 scripts/generate_pptx.py \
   --input  output/slides_final.md \
   --title  "Your Presentation Title" \
@@ -87,32 +103,83 @@ python3 scripts/generate_pptx.py \
 
 ---
 
+## Skills
+
+| Skill | Phase | What it does |
+|-------|-------|-------------|
+| `analyze-audience` | 1 | Profiles the audience → structured JSON |
+| `build-narrative` | 1 | Maps idea to framework → slide-by-slide outline |
+| `compose-slides` | 2 | Outline → full slide content with speaker notes |
+| `humanize-content` | 2 | Jargon sweep + hook application + reading level |
+| `critique-deck` | 2 | Scoring across 6 dimensions + actionable fix list |
+| `render-html-reveal` | 5 | Markdown → self-contained HTML presentation |
+| `render-pptx` | 6 | Markdown → .pptx via python-pptx |
+
+---
+
+## Workflow (Kiro Crew)
+
+The full pipeline is defined as a Kiro Crew Workflow at `.kiro/workflows/build-presentation.yml`.
+
+Launch it from the dashboard:
+```
+workflow_run(intent="Build a 5-slide pitch for my VP asking for budget approval")
+```
+
+Restart a failed phase without re-running earlier ones:
+```
+workflow_rerun_subtree(run_id="<id>", phase="humanize")
+```
+
+---
+
+## Examples
+
+| File | Scenario | Framework | Score |
+|------|----------|-----------|-------|
+| `examples/tech-to-exec-hiring.md` | Tech lead → VP: 2 new hires | SCQA | 8.8/10 |
+| `examples/tech-to-investor.md` | Founder → VC: LegalLens pitch | AIDA | 8.8/10 |
+| `examples/internal-demo.md` | Engineer → Product team: search feature | PSP | 8.7/10 |
+| `examples/workflow-run-example.md` | How to launch the workflow | — | — |
+
+---
+
+## Templates
+
+| Template | Audience | Slides |
+|----------|----------|--------|
+| `templates/tech-to-exec/template.md` | VP / C-suite | 5–7 |
+| `templates/tech-to-investor/template.md` | VC / Angel | 5 |
+| `templates/one-pager/template.md` | Anyone, 2 min | 1 |
+
+---
+
 ## Phases
 
 - [x] **Phase 0** — Repo scaffold + docs + agent specs
-- [x] **Phase 1** — Skills: `analyze-audience` + `build-narrative` (prompt-based, no deps)
+- [x] **Phase 1** — Skills: `analyze-audience` + `build-narrative`
 - [x] **Phase 2** — Skills: `compose-slides` + `humanize-content` + `critique-deck`
-- [x] **Phase 3** — Kiro Crew workflow (end-to-end pipeline as `.kiro/workflows/build-presentation.yml`)
+- [x] **Phase 3** — Kiro Crew workflow (`.kiro/workflows/build-presentation.yml`)
 - [x] **Phase 4** — Template library + examples (tech-to-exec, tech-to-investor, internal-demo)
-- [x] **Phase 5** — Output formats: `render-html-reveal` skill + HTML Reveal.js example
-- [x] **Phase 6** — PPTX export via `python-pptx==1.0.2` + `scripts/generate_pptx.py`
+- [x] **Phase 5** — HTML Reveal.js output (`render-html-reveal` skill)
+- [x] **Phase 6** — PPTX export (`render-pptx` skill + `scripts/generate_pptx.py`)
 
 ---
 
 ## Learning Kiro Crew with this project
 
-Each phase is designed to introduce a new Kiro Crew concept:
+Each phase introduces one Kiro Crew concept through a concrete task:
 
-| Phase | Kiro Crew concept you'll practice |
-|-------|-----------------------------------|
-| 1–2 | Skills (prompt files that give Kiro specialized behavior) |
-| 3 | Workflows (multi-phase, restartable pipelines via `workflow_run`) |
-| 4 | Artifacts (saving + versioning generated outputs) |
-| 5 | Subagents (critic runs independently, parallel review) |
-| 6 | Crons (scheduled deck refreshes, reminders) |
+| Phase | Kiro Crew concept | What you practiced |
+|-------|-------------------|--------------------|
+| 1–2 | **Skills** | `.md` files that give Kiro specialized behavior, activated by name |
+| 3 | **Workflows** | Restartable multi-phase pipelines via `workflow_run()` |
+| 4–5 | **Artifacts** | Versioned output stored in the dashboard library |
+| 6 | **Crons** | Scheduling recurring deck generation (see `render-pptx` skill doc) |
+| Next | **Subagents** | Run `critique-deck` in parallel with `humanize-content` via `spawn_run` |
 
 ---
 
 ## Contributing
 
-Built with [Kiro Crew](https://kiro.dev). See `docs/architecture.md` for deep dive.
+Built with [Kiro Crew](https://kiro.dev). See `docs/architecture.md` for the full agent spec and data flow.
