@@ -1,0 +1,235 @@
+name: build-presentation
+description: >
+  End-to-end pipeline that turns a raw idea + audience description into a
+  polished, audience-aware slide deck. Runs 5 sequential phases: audience
+  profiling → narrative arc → slide composition → humanization → critique.
+  Delivers the final deck as a Kiro Artifact with speaker notes.
+
+# How to launch:
+#   workflow_run(intent="Build a presentation about <idea> for <audience>")
+#   workflow_run(intent="Make slides explaining <topic> to <audience> in <N> minutes")
+#
+# How to restart a failed phase:
+#   workflow_rerun_subtree(run_id="<id>", phase="compose-slides")
+
+intent_examples:
+  - "Build a 5-slide pitch for my VP asking for budget approval"
+  - "Create a one-pager investor pitch for our app"
+  - "Make slides explaining our API redesign to the product team"
+  - "Build a tech-to-exec deck about why we need to migrate our database"
+
+inputs:
+  idea:
+    type: string
+    description: >
+      The raw idea, topic, or goal the presenter wants to communicate.
+      Can be a sentence or a paragraph — the pipeline will structure it.
+    required: true
+  audience_description:
+    type: string
+    description: >
+      Free-text description of the audience: their role, seniority, domain
+      familiarity, what they care about, how much time is available.
+    required: true
+  output_format:
+    type: string
+    enum: [markdown, html-reveal, speaker-notes-only]
+    default: markdown
+    description: Delivery format for the final deck artifact.
+  max_slides:
+    type: integer
+    default: 7
+    description: Hard cap on slide count. Overrides audience attention_span if lower.
+
+# ─────────────────────────────────────────────
+# PHASES
+# ─────────────────────────────────────────────
+
+phases:
+
+  # ── Phase 1 ──────────────────────────────
+  - id: profile-audience
+    name: "Profile the audience"
+    skill: analyze-audience
+    description: >
+      Identify who is in the room, what they care about, what will lose them,
+      and which narrative framework fits this audience type. Outputs a
+      structured JSON profile that drives every downstream decision.
+    inputs:
+      audience_description: "{{ inputs.audience_description }}"
+      idea: "{{ inputs.idea }}"
+    outputs:
+      audience_profile: audience_profile.json
+    stop_condition: >
+      Output contains profile_type, recommended_framework,
+      attention_span_slides, vocabulary, what_they_care_about,
+      what_loses_them, hook_type.
+    on_failure: abort
+    # No restart dependency — always safe to re-run from here.
+
+  # ── Phase 2 ──────────────────────────────
+  - id: build-narrative
+    name: "Build the narrative arc"
+    skill: build-narrative
+    description: >
+      Map the idea onto the framework chosen in Phase 1. Produce a
+      slide-by-slide outline: each slide gets a purpose, an action title,
+      and a content direction. No body copy yet — just the skeleton.
+    inputs:
+      idea: "{{ inputs.idea }}"
+      audience_profile: "{{ phases.profile-audience.outputs.audience_profile }}"
+      max_slides: "{{ inputs.max_slides }}"
+    outputs:
+      narrative_outline: narrative_outline.md
+    stop_condition: >
+      Outline has N slides ≤ max_slides, each with: framework slot,
+      one-sentence purpose, action title (complete sentence), content direction.
+      Final slide is an Ask with a specific decision and timeframe.
+    on_failure: abort
+    restart_safe: true
+    # Restart from here if the user requests a structural change after Phase 3+.
+
+  # ── Phase 3 ──────────────────────────────
+  - id: compose-slides
+    name: "Compose slide content"
+    skill: compose-slides
+    description: >
+      Fill in each slide from the narrative outline: action title, body
+      content (bullets / big number / contrast / story), visual direction,
+      and speaker note. Apply the one-idea-per-slide rule. Enforce 40-word
+      body copy limit.
+    inputs:
+      narrative_outline: "{{ phases.build-narrative.outputs.narrative_outline }}"
+      audience_profile: "{{ phases.profile-audience.outputs.audience_profile }}"
+    outputs:
+      slides_draft: slides_draft.md
+    stop_condition: >
+      Every slide has: action title (complete sentence, ≤12 words),
+      body content (≤40 words, ≤3 bullets), visual direction line,
+      speaker note (≤60 words with transition line).
+    on_failure: retry_once
+    restart_safe: true
+
+  # ── Phase 4 ──────────────────────────────
+  - id: humanize
+    name: "Humanize the content"
+    skill: humanize-content
+    description: >
+      Rewrite slide content for the specific audience: sweep for jargon,
+      apply the hook type from the audience profile, enforce reading level
+      (≤15 words/sentence for exec audiences), humanize speaker notes to
+      sound like natural speech. Produce a HUMANIZER NOTES section listing
+      every term replaced.
+    inputs:
+      slides_draft: "{{ phases.compose-slides.outputs.slides_draft }}"
+      audience_profile: "{{ phases.profile-audience.outputs.audience_profile }}"
+    outputs:
+      slides_humanized: slides_humanized.md
+    stop_condition: >
+      No jargon violations for audience vocabulary type.
+      All sentences ≤15 words for exec/investor audiences.
+      HUMANIZER NOTES section present.
+      Hook applied to Slide 1.
+    on_failure: retry_once
+    restart_safe: true
+
+  # ── Phase 5 ──────────────────────────────
+  - id: critique
+    name: "Critique the deck"
+    skill: critique-deck
+    description: >
+      Score the humanized deck across 6 dimensions (Clarity, Narrative Flow,
+      Audience Fit, So-What, Call-to-Action, Emotional Resonance). Produce
+      a critique report with critical issues (fix before presenting), minor
+      issues, and specific rewrites for each critical issue.
+    inputs:
+      slides_humanized: "{{ phases.humanize.outputs.slides_humanized }}"
+      narrative_outline: "{{ phases.build-narrative.outputs.narrative_outline }}"
+      audience_profile: "{{ phases.profile-audience.outputs.audience_profile }}"
+    outputs:
+      critique_report: critique_report.md
+      overall_score: float  # extracted from report
+    stop_condition: >
+      Report has overall_score (1-10), per-dimension scores,
+      critical issues list with specific slide references and fixes,
+      and a Recommendation field (Ship it | Revise | Rethink).
+    on_failure: abort
+
+  # ── Phase 6 (conditional) ────────────────
+  - id: revise
+    name: "Revise based on critique"
+    skill: compose-slides
+    description: >
+      Apply critical fixes from the critique report. Re-run humanize-content
+      on changed slides only. Targeted revision — do not rewrite slides that
+      scored well. Max 2 revision passes.
+    condition: "{{ phases.critique.outputs.overall_score < 8 }}"
+    inputs:
+      critique_report: "{{ phases.critique.outputs.critique_report }}"
+      slides_humanized: "{{ phases.humanize.outputs.slides_humanized }}"
+      audience_profile: "{{ phases.profile-audience.outputs.audience_profile }}"
+    outputs:
+      slides_final: slides_final.md
+    stop_condition: >
+      All critical issues addressed. Revised slides re-humanized.
+      No new jargon introduced.
+    max_iterations: 2
+    on_failure: skip_to_deliver
+    # If revision fails, deliver the humanized draft with the critique attached.
+
+  # ── Phase 7 ──────────────────────────────
+  - id: deliver
+    name: "Package and deliver"
+    description: >
+      Assemble the final output: pick slides_final if Phase 6 ran,
+      otherwise slides_humanized. Format according to output_format input.
+      Save as a Kiro Artifact (versioned, downloadable). Render an interactive
+      HTML widget showing the deck + critique scores side by side.
+    inputs:
+      slides: "{{ phases.revise.outputs.slides_final ?? phases.humanize.outputs.slides_humanized }}"
+      critique_report: "{{ phases.critique.outputs.critique_report }}"
+      output_format: "{{ inputs.output_format }}"
+    outputs:
+      artifact: presentation_artifact
+      speaker_notes: speaker_notes_artifact
+    deliver:
+      - type: artifact
+        name: "Presentation — {{ inputs.idea | truncate(40) }}"
+        content: "{{ outputs.artifact }}"
+      - type: artifact
+        name: "Speaker Notes — {{ inputs.idea | truncate(40) }}"
+        content: "{{ outputs.speaker_notes }}"
+      - type: widget
+        content: interactive HTML widget with tabs (Deck | Critique | Speaker Notes)
+    stop_condition: >
+      Artifact saved and accessible. Widget rendered with deck content,
+      critique scores, and speaker notes tab.
+
+# ─────────────────────────────────────────────
+# GLOBAL RULES
+# ─────────────────────────────────────────────
+
+rules:
+  - Always run profile-audience before any other phase.
+  - Never deliver a deck without running critique first (Phase 5 is not skippable).
+  - Action titles must be complete sentences — enforce at compose-slides, re-check at deliver.
+  - One idea per slide — enforced at compose-slides.
+  - The Ask slide is mandatory for any deck expecting a decision.
+  - Output format default is markdown; html-reveal adds Reveal.js wrapper.
+
+# ─────────────────────────────────────────────
+# KIRO CREW CONCEPTS USED
+# ─────────────────────────────────────────────
+#
+# This workflow teaches the following Kiro Crew concepts:
+#
+# Phase 1-5   → Skills: each phase calls a skill file from /skills/<name>/SKILL.md
+# Phase 6     → Conditional execution: phase runs only if score < 8
+# Phase 6     → Iteration: max_iterations: 2 (loop until quality threshold)
+# Phase 7     → Artifacts: versioned output saved to Kiro Artifact library
+# Phase 7     → Widgets: inline HTML rendered in the dashboard
+# All phases  → Restartability: workflow_rerun_subtree(run_id, phase) to restart
+#               from any phase without re-running earlier ones
+# Future      → Subagents: Phase 5 (critique) can run in parallel with Phase 4
+#               once compose-slides output is stable
+# Future      → Crons: schedule weekly deck refresh or delivery reminders
