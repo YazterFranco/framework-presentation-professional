@@ -72,10 +72,17 @@ Output: Polished slide content + speaker notes + delivery tips
 
 ```bash
 # Install
-pip install -r requirements.txt   # (coming in Phase 2)
+pip install python-pptx==1.0.2   # required for PPTX export
 
 # Run via Kiro Crew
 # → Ask Kiro: "Use the presentation framework to build a pitch for [your idea] targeting [your audience]"
+
+# Generate PPTX directly
+python3 scripts/generate_pptx.py \
+  --input  output/slides_final.md \
+  --title  "Your Presentation Title" \
+  --tone   formal \
+  --output output/your-presentation.pptx
 ```
 
 ---
@@ -88,7 +95,7 @@ pip install -r requirements.txt   # (coming in Phase 2)
 - [x] **Phase 3** — Kiro Crew workflow (end-to-end pipeline as `.kiro/workflows/build-presentation.yml`)
 - [x] **Phase 4** — Template library + examples (tech-to-exec, tech-to-investor, internal-demo)
 - [x] **Phase 5** — Output formats: `render-html-reveal` skill + HTML Reveal.js example
-- [ ] **Phase 6** — PPTX export via python-pptx
+- [x] **Phase 6** — PPTX export via `python-pptx==1.0.2` + `scripts/generate_pptx.py`
 
 ---
 
