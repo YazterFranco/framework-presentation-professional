@@ -87,7 +87,7 @@ pip install -r requirements.txt   # (coming in Phase 2)
 - [x] **Phase 2** — Skills: `compose-slides` + `humanize-content` + `critique-deck`
 - [x] **Phase 3** — Kiro Crew workflow (end-to-end pipeline as `.kiro/workflows/build-presentation.yml`)
 - [x] **Phase 4** — Template library + examples (tech-to-exec, tech-to-investor, internal-demo)
-- [ ] **Phase 5** — Output formats: HTML Reveal.js, speaker notes export
+- [x] **Phase 5** — Output formats: `render-html-reveal` skill + HTML Reveal.js example
 - [ ] **Phase 6** — PPTX export via python-pptx
 
 ---
